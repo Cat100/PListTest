@@ -9,17 +9,58 @@
 import UIKit
 
 class ViewController: UIViewController {
+    
+    var tripNumber: AnyObject!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        
+        loadPList()
+        saveCount(234)
+    
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    func loadPList() {
+        
+        let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory,
+            .UserDomainMask,
+            true) as [AnyObject]
+        let documentsDirectory = paths[0] as! String
+        let documentsPath = documentsDirectory.stringByAppendingPathComponent("anyoldplist.plist")
+        
+        let fileManager = NSFileManager.defaultManager()
+        
+        if !fileManager.fileExistsAtPath(documentsPath) {
+            if let bundlePath = NSBundle.mainBundle().pathForResource("anyoldplist", ofType: "plist") {
+                fileManager.copyItemAtPath(bundlePath, toPath: documentsPath, error: nil)
+            }
+        }
+        
+        if let dict = NSMutableDictionary(contentsOfFile: documentsPath) {
+            tripNumber = dict.objectForKey("tripCount")
+        }
     }
-
-
+    
+    func saveCount(tripNum: Int) {
+        
+        let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory,
+            .UserDomainMask,
+            true) as [AnyObject]
+        let documentsDirectory = paths[0] as! String
+        let documentsPath = documentsDirectory.stringByAppendingPathComponent("anyoldplist.plist")
+        
+        let fileManager = NSFileManager.defaultManager()
+        
+        if !fileManager.fileExistsAtPath(documentsPath) {
+            
+            println("Error")
+            
+        } else {
+            
+            let dict = NSMutableDictionary(contentsOfFile: documentsPath)
+            dict?.setObject(tripNum, forKey: "tripCount")
+            dict?.writeToFile(documentsPath, atomically: false)
+        }
+    }
 }
 
