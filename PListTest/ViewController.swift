@@ -10,57 +10,61 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    var tripNumber: AnyObject!
+    var tripNumber = Int()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        loadPList()
-        saveCount(234)
-    
+        var count: Int = loadPList()
+        println(count)
+        saveCount(++count)
+        println(count)
     }
     
-    func documentsPath() -> String {
+    
+    func loadPList() -> Int {
         
         let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory,
             .UserDomainMask,
             true)
         let documentsDirectory = paths[0] as! String
+        let documentsPath = documentsDirectory.stringByAppendingPathComponent("appValues.plist")
         
-        return documentsDirectory.stringByAppendingPathComponent("anyoldplist.plist")
-        
-    }
-    
-    func loadPList() {
-        
+        println(documentsPath)
         
         let fileManager = NSFileManager.defaultManager()
         
-        if !fileManager.fileExistsAtPath(documentsPath()) {
+        if !fileManager.fileExistsAtPath(documentsPath) {
             if let bundlePath = NSBundle.mainBundle().pathForResource("anyoldplist", ofType: "plist") {
-                fileManager.copyItemAtPath(bundlePath, toPath: documentsPath(), error: nil)
+                fileManager.copyItemAtPath(bundlePath, toPath: documentsPath, error: nil)
             }
         }
         
-        if let dict = NSMutableDictionary(contentsOfFile: documentsPath()) {
-            tripNumber = dict.objectForKey("tripCount")
+        if let dict = NSMutableDictionary(contentsOfFile: documentsPath) {
+            tripNumber = dict.objectForKey("tripCount") as! Int
         }
+        return tripNumber
     }
     
     func saveCount(tripNum: Int) {
-        
+        println("<--> \(tripNum)")
+        let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory,
+            .UserDomainMask,
+            true)
+        let documentsDirectory = paths[0] as! String
+        let documentsPath = documentsDirectory.stringByAppendingPathComponent("appValues.plist")
         
         let fileManager = NSFileManager.defaultManager()
-        ()
-        if !fileManager.fileExistsAtPath(documentsPath()) {
+        
+        if !fileManager.fileExistsAtPath(documentsPath) {
             
             println("Error")
             
         } else {
             
-            let dict = NSMutableDictionary(contentsOfFile: documentsPath())
+            let dict = NSMutableDictionary(contentsOfFile: documentsPath)
             dict?.setObject(tripNum, forKey: "tripCount")
-            dict?.writeToFile(documentsPath(), atomically: false)
+            dict?.writeToFile(documentsPath, atomically: false)
         }
     }
 }
